@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alumni Network</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: var(--hub-bg, #f9fafb);
+      --surface: var(--hub-surface, #ffffff);
+      --border: var(--hub-border, #e5e7eb);
+      --border-mid: var(--hub-border, #d1d5db);
+      --text: var(--hub-text, #111827);
+      --muted: var(--hub-text-muted, #6b7280);
+      --accent: var(--hub-primary, #1d4ed8);
+      --accent-hover: var(--hub-primary-hover, #1e40af);
+      --accent-fg: var(--hub-primary-fg, #ffffff);
+      --radius: var(--hub-radius, 8px);
+      --green: #047857; --green-soft: #d1fae5;
+      --amber: #b45309; --amber-soft: #fef3c7;
+      --red: #b91c1c; --red-soft: #fee2e2;
+      --blue-soft: #dbeafe;
+      --shadow: 0 1px 3px rgba(15, 23, 42, .07);
+    }
+    body { min-height: 100vh; background: var(--bg); color: var(--text); font-family: var(--hub-font, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif); font-size: var(--hub-font-size, 15px); line-height: 1.5; }
+    .app { max-width: 860px; margin: 0 auto; padding: 16px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+    h1 { font-size: 1.35rem; line-height: 1.2; }
+    h2 { font-size: 1rem; margin-bottom: 10px; }
+    .muted { color: var(--muted); } .tiny { font-size: .78rem; }
+    .grid { display: grid; gap: 12px; }
+    @media (min-width: 640px) { .grid.cards { grid-template-columns: 1fr 1fr; } }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px; }
+    .search { margin: 12px 0; }
+    .search input { width: 100%; border: 1.5px solid var(--border-mid); border-radius: 8px; padding: 10px 12px; font: inherit; background: var(--surface); color: var(--text); }
+    .alum-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+    .alum-name { font-weight: 750; font-size: 1.02rem; }
+    .alum-meta { margin-top: 3px; color: var(--muted); font-size: .84rem; }
+    .alum-bio { margin-top: 8px; font-size: .92rem; }
+    .contact { margin-top: 8px; font-size: .85rem; display: flex; flex-direction: column; gap: 2px; }
+    .contact a { color: var(--accent); text-decoration: none; }
+    .pill { display: inline-flex; align-items: center; min-height: 20px; padding: 1px 8px; border-radius: 999px; background: #f1f5f9; color: var(--muted); font-size: .7rem; font-weight: 800; }
+    .pill.info { background: var(--blue-soft); color: #1d4ed8; }
+    .pill.me { background: var(--green-soft); color: var(--green); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid transparent; border-radius: 8px; padding: 8px 12px; font: inherit; font-size: .86rem; font-weight: 700; cursor: pointer; min-height: 38px; background: var(--accent); color: var(--accent-fg); }
+    .btn:hover { background: var(--accent-hover); }
+    .btn:disabled { opacity: .48; cursor: default; }
+    .btn-ghost { background: transparent; color: var(--text); border-color: var(--border-mid); }
+    .btn-ghost:hover { background: #f8fafc; }
+    .btn-danger { background: var(--red-soft); color: var(--red); border-color: transparent; }
+    .btn-sm { min-height: 30px; padding: 4px 9px; font-size: .77rem; }
+    .row-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+    .form { display: grid; gap: 10px; }
+    .field { display: grid; gap: 4px; }
+    label { font-size: .76rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 800; }
+    input, textarea, select { width: 100%; border: 1.5px solid var(--border-mid); border-radius: 8px; padding: 9px 11px; font: inherit; background: var(--surface); color: var(--text); }
+    textarea { min-height: 64px; resize: vertical; }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); }
+    .empty, .loading { color: var(--muted); text-align: center; padding: 32px 16px; }
+    .error { background: var(--red-soft); color: var(--red); padding: 9px 12px; border-radius: 8px; margin-bottom: 10px; font-size: .86rem; }
+    .notice { background: var(--green-soft); color: var(--green); padding: 9px 12px; border-radius: 8px; margin-bottom: 10px; font-size: .86rem; }
+    .settings-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; padding: 10px 12px; background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; font-size: .84rem; }
+    .settings-bar select { width: auto; flex: 1; min-width: 160px; }
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(15,23,42,.45); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 50; }
+    .modal { background: var(--surface); border-radius: 12px; padding: 18px; width: 100%; max-width: 480px; box-shadow: 0 12px 40px rgba(0,0,0,.25); max-height: 90vh; overflow-y: auto; }
+    .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 6px; }
+    .grid.two { display: grid; gap: 10px; }
+    @media (min-width: 520px) { .grid.two { grid-template-columns: 1fr 1fr; } }
+  </style>
+  <base href="/run/alumni/">
+</head>
+<body>
+<div class="app">
+  <div id="root" class="loading">Loading…</div>
+</div>
+
+<script type="module">
+import { esc, isAdult, hubConfirm } from "/hub-sdk.js";
+import { isLeadership as _isLeadership, filterRoster } from "./logic.js";
+
+const CONTEXT = window.__CONTEXT_URL ?? "";
+const DB = window.__DB_URL ?? "";
+const HUB_MEMBER = window.__CURRENT_MEMBER ?? null;
+const IS_ADMIN = !!window.__IS_ADMIN;
+const ADMIN_CONFIG_URL = window.__ADMIN_CONFIG_URL ?? "";
+
+let members = [];
+let groups = [];
+let currentMember = null;
+let profiles = [];
+let leadershipGroupId = "";
+let query = "";
+let error = "";
+let notice = "";
+let modalEl = null;
+
+function nowIso() { return new Date().toISOString(); }
+function uid() { return crypto.randomUUID(); }
+
+async function dbq(sql, params = []) {
+  if (!DB) return { rows: [] };
+  const res = await fetch(DB, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sql, params }) });
+  const json = await res.json();
+  if (json.error) throw new Error(json.error);
+  return json;
+}
+
+// bind the pure gate to app state
+function isLeadership(member = currentMember) { return _isLeadership(member, groups, leadershipGroupId); }
+function myProfile() { return profiles.find(p => p.member_id === currentMember?.id) ?? null; }
+function canManage(profile) { return profile.member_id === currentMember?.id || isLeadership(); }
+
+async function loadContext() {
+  if (!CONTEXT) {
+    members = [
+      { id: "demo-1", name: "Alex Rivera", role: "adult" },
+      { id: "demo-2", name: "Jordan Kim", role: "adult" },
+    ];
+    groups = [{ id: "g-lead", name: "Leadership", memberIds: ["demo-1"] }];
+  } else {
+    try {
+      const res = await fetch(`${CONTEXT}?keys=family.members,family.groups`);
+      const ctx = await res.json();
+      members = ctx["family.members"] ?? [];
+      groups = ctx["family.groups"] ?? [];
+    } catch { members = []; groups = []; }
+  }
+  currentMember = HUB_MEMBER ?? members[0] ?? { id: "guest", name: "Guest", role: "adult" };
+}
+
+async function loadSettings() {
+  if (!DB) { leadershipGroupId = "g-lead"; return; }
+  try {
+    const r = await dbq("SELECT value FROM app_alumni__alumni_settings WHERE key = ? LIMIT 1", ["leadership_group_id"]);
+    leadershipGroupId = r.rows?.[0]?.value ?? "";
+  } catch { leadershipGroupId = ""; }
+}
+
+function seedDemo() {
+  profiles = [
+    { id: "p1", member_id: "demo-1", member_name: "Alex Rivera", grad_year: "2014", city: "Chicago", employer: "Northwind", job_title: "Design Lead", bio: "Ran socials chair '13.", email: "alex@example.com", phone: "", visibility: "everyone", created_at: nowIso(), updated_at: nowIso() },
+    { id: "p2", member_id: "demo-3", member_name: "Priya Shah", grad_year: "2009", city: "Seattle", employer: "Cascade Labs", job_title: "Founder", bio: "", email: "", phone: "", visibility: "everyone", created_at: nowIso(), updated_at: nowIso() },
+  ];
+}
+
+async function loadProfiles() {
+  if (!DB) { seedDemo(); return; }
+  const r = await dbq("SELECT * FROM app_alumni__profiles ORDER BY (grad_year = ''), grad_year DESC, member_name ASC");
+  profiles = r.rows;
+}
+
+async function refresh() {
+  clearMessages();
+  try {
+    await loadContext();
+    await Promise.all([loadSettings(), loadProfiles()]);
+    render();
+  } catch (e) { error = e.message; render(); }
+}
+
+function clearMessages() { error = ""; notice = ""; }
+function showError(m) { error = m; notice = ""; render(); }
+function showNotice(m) { notice = m; error = ""; render(); }
+
+// ── mutations ────────────────────────────────────────────────────────────────
+async function saveProfile(fields, existingId) {
+  const gradYear = fields.grad_year.trim();
+  const now = nowIso();
+  if (existingId) {
+    const idx = profiles.findIndex(p => p.id === existingId);
+    if (idx === -1) return;
+    if (!canManage(profiles[idx])) return showError("You can only edit your own profile.");
+    try {
+      if (DB) {
+        await dbq(
+          `UPDATE app_alumni__profiles SET grad_year=?, city=?, employer=?, job_title=?, bio=?, email=?, phone=?, updated_at=? WHERE id=?`,
+          [gradYear, fields.city.trim(), fields.employer.trim(), fields.job_title.trim(), fields.bio.trim(), fields.email.trim(), fields.phone.trim(), now, existingId]
+        );
+      }
+      profiles[idx] = { ...profiles[idx], grad_year: gradYear, city: fields.city.trim(), employer: fields.employer.trim(), job_title: fields.job_title.trim(), bio: fields.bio.trim(), email: fields.email.trim(), phone: fields.phone.trim(), updated_at: now };
+      closeModal();
+      showNotice("Profile saved.");
+    } catch (e) { showError(e.message); }
+    return;
+  }
+  // create my own profile
+  const row = {
+    id: uid(), member_id: currentMember.id, member_name: currentMember.name,
+    grad_year: gradYear, city: fields.city.trim(), employer: fields.employer.trim(),
+    job_title: fields.job_title.trim(), bio: fields.bio.trim(),
+    email: fields.email.trim(), phone: fields.phone.trim(),
+    visibility: "everyone", created_at: now, updated_at: now,
+  };
+  try {
+    if (DB) {
+      await dbq(
+        `INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, bio, email, phone, visibility, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'everyone', ?, ?)`,
+        [row.id, row.member_id, row.member_name, row.grad_year, row.city, row.employer, row.job_title, row.bio, row.email, row.phone, row.created_at, row.updated_at]
+      );
+    }
+    profiles = [row, ...profiles];
+    closeModal();
+    showNotice("Your alumni profile is live.");
+  } catch (e) { showError(e.message); }
+}
+
+async function removeProfile(id) {
+  const p = profiles.find(x => x.id === id);
+  if (!p) return;
+  if (!canManage(p)) return showError("You can't remove this profile.");
+  const ok = await hubConfirm({ message: `Remove ${p.member_name} from the alumni roster?`, confirmLabel: "Remove", destructive: true });
+  if (!ok) return;
+  try {
+    if (DB) await dbq(`DELETE FROM app_alumni__profiles WHERE id=?`, [id]);
+    profiles = profiles.filter(x => x.id !== id);
+    showNotice("Removed.");
+  } catch (e) { showError(e.message); }
+}
+
+async function saveLeadershipGroup(value) {
+  if (!IS_ADMIN) return showError("Only a hub admin can set the leadership group.");
+  try {
+    if (ADMIN_CONFIG_URL) {
+      const res = await fetch(ADMIN_CONFIG_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key: "leadership_group_id", value }) });
+      const json = await res.json();
+      if (!res.ok || json.error) throw new Error(json.error || "Save failed");
+    }
+    leadershipGroupId = value;
+    showNotice(value ? "Leadership group updated." : "Leadership group cleared.");
+  } catch (e) { showError(e.message); }
+}
+
+// ── modal ────────────────────────────────────────────────────────────────────
+function openModal(html) {
+  closeModal();
+  modalEl = document.createElement("div");
+  modalEl.className = "modal-backdrop";
+  modalEl.innerHTML = `<div class="modal">${html}</div>`;
+  modalEl.addEventListener("click", e => { if (e.target === modalEl) closeModal(); });
+  document.body.appendChild(modalEl);
+  const f = modalEl.querySelector("[data-autofocus]");
+  if (f) f.focus();
+}
+function closeModal() { modalEl?.remove(); modalEl = null; }
+
+function openProfileModal(existingId) {
+  const p = existingId ? profiles.find(x => x.id === existingId) : null;
+  openModal(`
+    <h2>${p ? "Edit profile" : "Create your alumni profile"}</h2>
+    <form class="form" id="profile-form" data-id="${p ? esc(p.id) : ""}">
+      <div class="grid two">
+        <div class="field">
+          <label for="f-grad">Graduation year</label>
+          <input id="f-grad" data-autofocus inputmode="numeric" value="${p ? esc(p.grad_year || "") : ""}" placeholder="2014" />
+        </div>
+        <div class="field">
+          <label for="f-city">Current city</label>
+          <input id="f-city" value="${p ? esc(p.city || "") : ""}" placeholder="Chicago, IL" />
+        </div>
+      </div>
+      <div class="grid two">
+        <div class="field">
+          <label for="f-employer">Employer</label>
+          <input id="f-employer" value="${p ? esc(p.employer || "") : ""}" placeholder="Company" />
+        </div>
+        <div class="field">
+          <label for="f-title">Role / title</label>
+          <input id="f-title" value="${p ? esc(p.job_title || "") : ""}" placeholder="Job title" />
+        </div>
+      </div>
+      <div class="field">
+        <label for="f-bio">Bio</label>
+        <textarea id="f-bio" placeholder="What you're up to, chapter memories…">${p ? esc(p.bio || "") : ""}</textarea>
+      </div>
+      <p class="tiny muted">Contact info is opt-in — leave blank to keep it private. When filled, it's shown only to active members and leadership.</p>
+      <div class="grid two">
+        <div class="field">
+          <label for="f-email">Email (opt-in)</label>
+          <input id="f-email" type="email" value="${p ? esc(p.email || "") : ""}" placeholder="you@example.com" />
+        </div>
+        <div class="field">
+          <label for="f-phone">Phone (opt-in)</label>
+          <input id="f-phone" value="${p ? esc(p.phone || "") : ""}" placeholder="Optional" />
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" type="button" data-close>Cancel</button>
+        <button class="btn" type="submit">${p ? "Save" : "Publish profile"}</button>
+      </div>
+    </form>
+  `);
+}
+
+// ── render ───────────────────────────────────────────────────────────────────
+function renderMessages() { return `${error ? `<div class="error">${esc(error)}</div>` : ""}${notice ? `<div class="notice">${esc(notice)}</div>` : ""}`; }
+
+function renderSettingsBar() {
+  if (!IS_ADMIN) return "";
+  return `
+    <div class="settings-bar">
+      <span>🔧 Leadership group (manages the roster):</span>
+      <select id="lead-group">
+        <option value="">— none —</option>
+        ${groups.map(g => `<option value="${esc(g.id)}" ${g.id === leadershipGroupId ? "selected" : ""}>${esc(g.name || g.id)}</option>`).join("")}
+      </select>
+      ${!leadershipGroupId ? `<span class="tiny muted">Until set, only each alum can edit their own profile.</span>` : ""}
+    </div>
+  `;
+}
+
+function contactBlock(p) {
+  // email/phone come back masked (null) unless the viewer is the owner, an
+  // adult member, or leadership — so simply render whatever the server returned.
+  const rows = [];
+  if (p.email) rows.push(`<a href="mailto:${esc(p.email)}">${esc(p.email)}</a>`);
+  if (p.phone) rows.push(`<a href="tel:${esc(p.phone)}">${esc(p.phone)}</a>`);
+  return rows.length ? `<div class="contact">${rows.join("")}</div>` : "";
+}
+
+function renderProfile(p) {
+  const mine = p.member_id === currentMember?.id;
+  const metaBits = [p.grad_year ? `Class of ${p.grad_year}` : "", p.city, [p.job_title, p.employer].filter(Boolean).join(" @ ")].filter(Boolean);
+  return `
+    <article class="card">
+      <div class="alum-head">
+        <div>
+          <div class="alum-name">${esc(p.member_name)} ${mine ? `<span class="pill me">You</span>` : ""}</div>
+          <div class="alum-meta">${esc(metaBits.join(" · "))}</div>
+        </div>
+      </div>
+      ${p.bio ? `<div class="alum-bio">${esc(p.bio)}</div>` : ""}
+      ${contactBlock(p)}
+      ${canManage(p) ? `
+        <div class="row-actions">
+          <button class="btn btn-ghost btn-sm" data-edit="${esc(p.id)}">Edit</button>
+          <button class="btn btn-danger btn-sm" data-remove="${esc(p.id)}">Remove</button>
+        </div>` : ""}
+    </article>
+  `;
+}
+
+function render() {
+  const root = document.getElementById("root");
+  root.className = "app";
+  const list = filterRoster(profiles, query);
+  const mine = myProfile();
+  root.innerHTML = `
+    <div class="topbar">
+      <div>
+        <h1>🎓 Alumni Network</h1>
+        <p class="muted tiny">${profiles.length} alum${profiles.length === 1 ? "" : "ni"}${isLeadership() ? " · you manage the roster" : ""}</p>
+      </div>
+      <button class="btn" data-profile="${mine ? esc(mine.id) : ""}">${mine ? "Edit my profile" : "Add my profile"}</button>
+    </div>
+    ${renderMessages()}
+    ${renderSettingsBar()}
+    <div class="search"><input id="search" type="search" placeholder="Search by name, year, city, employer…" value="${esc(query)}" /></div>
+    <section class="grid cards">
+      ${list.length ? list.map(renderProfile).join("") : `<div class="card empty">${profiles.length ? "No alumni match your search." : "No alumni yet — add your profile to get started."}</div>`}
+    </section>
+  `;
+  const s = document.getElementById("search");
+  if (s) s.addEventListener("input", () => { query = s.value; rerenderList(); });
+}
+
+// re-render only the list to keep the search box focused
+function rerenderList() {
+  const list = filterRoster(profiles, query);
+  const container = document.querySelector(".grid.cards");
+  if (container) container.innerHTML = list.length ? list.map(renderProfile).join("") : `<div class="card empty">${profiles.length ? "No alumni match your search." : "No alumni yet."}</div>`;
+}
+
+// ── events ───────────────────────────────────────────────────────────────────
+document.addEventListener("click", (e) => {
+  const t = e.target.closest("button");
+  if (!t) return;
+  if (t.hasAttribute("data-close")) { closeModal(); return; }
+  if (t.hasAttribute("data-profile")) { openProfileModal(t.getAttribute("data-profile") || null); return; }
+  if (t.hasAttribute("data-edit")) { openProfileModal(t.getAttribute("data-edit")); return; }
+  if (t.hasAttribute("data-remove")) { removeProfile(t.getAttribute("data-remove")); return; }
+});
+
+document.addEventListener("change", (e) => {
+  if (e.target.id === "lead-group") { saveLeadershipGroup(e.target.value); }
+});
+
+document.addEventListener("submit", (e) => {
+  if (e.target.id !== "profile-form") return;
+  e.preventDefault();
+  const f = e.target;
+  const existingId = f.getAttribute("data-id") || null;
+  const btn = f.querySelector(".modal-actions .btn:not(.btn-ghost)");
+  const val = (id) => document.getElementById(id)?.value ?? "";
+  if (btn) { btn.disabled = true; btn.textContent = "Saving…"; }
+  saveProfile({
+    grad_year: val("f-grad"), city: val("f-city"), employer: val("f-employer"),
+    job_title: val("f-title"), bio: val("f-bio"), email: val("f-email"), phone: val("f-phone"),
+  }, existingId).catch(() => { if (btn) { btn.disabled = false; btn.textContent = existingId ? "Save" : "Publish profile"; } });
+});
+
+refresh();
+</script>
+</body>
+</html>

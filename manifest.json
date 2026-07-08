@@ -1,0 +1,58 @@
+{
+  "id": "alumni",
+  "name": "Alumni Network",
+  "version": "1.0.0",
+  "description": "A searchable alumni roster — graduation year, current city, employer, and opt-in contact info. Alumni update their own profile, active members browse, and leadership manages the roster. Keeps chapter history alive without giving alumni full hub access.",
+  "entrypoint": "index.html",
+  "runtime": "static",
+  "icon": "🎓",
+  "category": "organization",
+  "tags": ["alumni", "directory", "roster", "organization", "network"],
+  "storage": "db",
+  "db_plaintext_columns": ["grad_year"],
+  "data_access": {
+    "reads": ["family.members", "family.groups"],
+    "writes": []
+  },
+  "permissions": {
+    "default_audience": "everyone",
+    "requires_approval": false
+  },
+  "row_policies": {
+    "alumni_settings": { "kind": "app_config" },
+    "profiles": {
+      "kind": "owner_or_visibility",
+      "member_column": "member_id",
+      "visibility_column": "visibility",
+      "everyone_values": ["everyone"],
+      "write_owner_only": true,
+      "privileged_groups": [
+        { "settings_table": "alumni_settings", "settings_key": "leadership_group_id" }
+      ],
+      "column_read_acls": {
+        "email": { "visible_to": ["owner", "adult", "privileged"] },
+        "phone": { "visible_to": ["owner", "adult", "privileged"] }
+      }
+    }
+  },
+  "admin_config": {
+    "settings_table": "alumni_settings",
+    "keys": ["leadership_group_id"]
+  },
+  "nav": { "label": "Alumni" },
+  "glance": {
+    "source": {
+      "kind": "sql",
+      "query": "SELECT COUNT(*) AS n FROM app_alumni__profiles LIMIT 1"
+    },
+    "display": { "template": "badge", "count": "n", "label": "alumni", "severity": "info" }
+  },
+  "resource_limits": {
+    "max_db_bytes": 10485760
+  },
+  "ai_access": {
+    "allowed": true,
+    "mode": "read",
+    "db_exports": ["alumni_roster"]
+  }
+}
