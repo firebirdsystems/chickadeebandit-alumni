@@ -1,0 +1,36 @@
+{
+  "scenarios": [
+    {
+      "name": "profile email/phone are visible to the owner and adults but masked for other non-adults",
+      "members": { "kid": "child", "kid2": "child", "adult": "adult" },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, email, phone, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, 'everyone', ?, ?)",
+          "params": ["pr1", "{{kid}}", "Kid Alum", "kid@example.com", "555-0101", "2026-01-01T00:00:00Z", "2026-01-01T00:00:00Z"]
+        },
+        {
+          "action": "db",
+          "as": "kid",
+          "sql": "SELECT member_name, email FROM app_alumni__profiles WHERE id = ?",
+          "params": ["pr1"],
+          "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "email": "kid@example.com" }] }
+        },
+        {
+          "action": "db",
+          "as": "kid2",
+          "sql": "SELECT member_name, email, phone FROM app_alumni__profiles WHERE id = ?",
+          "params": ["pr1"],
+          "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "email": null, "phone": null }] }
+        },
+        {
+          "action": "db",
+          "as": "adult",
+          "sql": "SELECT email FROM app_alumni__profiles WHERE id = ?",
+          "params": ["pr1"],
+          "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "email": "kid@example.com" }] }
+        }
+      ]
+    }
+  ]
+}
