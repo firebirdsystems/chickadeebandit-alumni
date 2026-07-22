@@ -1,5 +1,6 @@
 {
   "id": "alumni",
+  "contexts": ["household", "shared_space"],
   "name": "Alumni Network",
   "version": "1.0.0",
   "description": "A searchable alumni roster — graduation year, current city, employer, and opt-in contact info. Alumni update their own profile, active members browse, and leadership manages the roster. Keeps chapter history alive without giving alumni full hub access.",
