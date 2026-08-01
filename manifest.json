@@ -40,6 +40,10 @@
     "settings_table": "alumni_settings",
     "keys": ["leadership_group_id"]
   },
+  "member_references": {
+    "profiles": { "column": "member_id", "on_removed": "keep" }
+  },
+  "kiosk": "never",
   "nav": { "label": "Alumni" },
   "glance": {
     "source": {
