@@ -19,13 +19,18 @@ export function isLeadership(member, groups, groupId) {
   return !!group && Array.isArray(group.memberIds) && group.memberIds.includes(member.id);
 }
 
-/** Filter a roster by a free-text query across the visible profile fields. */
-export function filterRoster(profiles, query) {
-  const q = (query || "").trim().toLowerCase();
-  if (!q) return profiles;
-  return profiles.filter((p) => {
-    const hay = [p.member_name, p.grad_year, p.city, p.employer, p.job_title, p.bio]
-      .filter(Boolean).join(" ").toLowerCase();
-    return hay.includes(q);
-  });
+/**
+ * Fields the in-app search matches against (see hub-sdk `searchMatch`). Covers
+ * every field the roster card shows, so an alum is findable by where they live
+ * or who they work for, not just by name.
+ */
+export function searchableFields(profile) {
+  return [
+    profile.member_name,
+    profile.grad_year,
+    profile.city,
+    profile.employer,
+    profile.job_title,
+    profile.bio,
+  ];
 }

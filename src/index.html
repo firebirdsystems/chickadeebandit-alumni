@@ -76,8 +76,8 @@
 </div>
 
 <script type="module">
-import { esc, isAdult, hubConfirm } from "/hub-sdk.js";
-import { isLeadership as _isLeadership, filterRoster } from "./logic.js";
+import { esc, isAdult, hubConfirm, searchMatch } from "/hub-sdk.js";
+import { isLeadership as _isLeadership, searchableFields } from "./logic.js";
 
 const CONTEXT = window.__CONTEXT_URL ?? "";
 const DB = window.__DB_URL ?? "";
@@ -344,7 +344,7 @@ function renderProfile(p) {
 function render() {
   const root = document.getElementById("root");
   root.className = "app";
-  const list = filterRoster(profiles, query);
+  const list = matchingProfiles();
   const mine = myProfile();
   root.innerHTML = `
     <div class="topbar">
@@ -365,9 +365,15 @@ function render() {
   if (s) s.addEventListener("input", () => { query = s.value; rerenderList(); });
 }
 
+// The shared matcher: diacritic-insensitive, and every typed token has to hit
+// some field, so "dana acme" narrows instead of matching nothing.
+function matchingProfiles() {
+  return query ? profiles.filter((p) => searchMatch(query, searchableFields(p))) : profiles;
+}
+
 // re-render only the list to keep the search box focused
 function rerenderList() {
-  const list = filterRoster(profiles, query);
+  const list = matchingProfiles();
   const container = document.querySelector(".grid.cards");
   if (container) container.innerHTML = list.length ? list.map(renderProfile).join("") : `<div class="card empty">${profiles.length ? "No alumni match your search." : "No alumni yet."}</div>`;
 }
