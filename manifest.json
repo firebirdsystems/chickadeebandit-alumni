@@ -11,7 +11,7 @@
   "tags": ["alumni", "directory", "roster", "organization", "network"],
   "storage": "db",
   "preload": {
-    "profiles": {"sql": "SELECT * FROM app_alumni__profiles ORDER BY (grad_year = ''), grad_year DESC, member_name ASC"}
+    "profiles": {"sql": "SELECT * FROM app_alumni__profiles ORDER BY grad_year DESC, id ASC"}
   },
   "db_plaintext_columns": ["grad_year"],
   "data_access": {

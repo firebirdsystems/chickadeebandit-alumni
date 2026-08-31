@@ -34,3 +34,27 @@ export function searchableFields(profile) {
     profile.bio,
   ];
 }
+
+/**
+ * Roster order: newest class first, then alphabetical within a class.
+ *
+ * The SQL deliberately orders by grad_year alone. `member_name` is encrypted at
+ * rest — only `grad_year` is declared in db_plaintext_columns — so an SQL
+ * `ORDER BY member_name` sorts ciphertext: it looks alphabetical, produces an
+ * arbitrary order, and costs a full-table sort to do it. The names are only
+ * alphabetisable once the hub has decrypted them, which is here.
+ *
+ * Blank grad years sort last, matching what `ORDER BY grad_year DESC` gives —
+ * '' is the minimum TEXT value, so descending already puts it at the end.
+ *
+ * Sorts in place and returns the same array.
+ *
+ * @param {Array<{grad_year?: string, member_name?: string}>} profiles
+ */
+export function sortRoster(profiles) {
+  return profiles.sort(
+    (a, b) =>
+      String(b.grad_year || "").localeCompare(String(a.grad_year || "")) ||
+      String(a.member_name || "").localeCompare(String(b.member_name || "")),
+  );
+}

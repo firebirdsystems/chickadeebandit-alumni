@@ -77,7 +77,7 @@
 
 <script type="module">
 import { esc, isAdult, hubConfirm, searchMatch } from "/hub-sdk.js";
-import { isLeadership as _isLeadership, searchableFields } from "./logic.js";
+import { isLeadership as _isLeadership, searchableFields, sortRoster } from "./logic.js";
 
 const CONTEXT = window.__CONTEXT_URL ?? "";
 const DB = window.__DB_URL ?? "";
@@ -142,12 +142,18 @@ function seedDemo() {
     { id: "p1", member_id: "demo-1", member_name: "Alex Rivera", grad_year: "2014", city: "Chicago", employer: "Northwind", job_title: "Design Lead", bio: "Ran socials chair '13.", email: "alex@example.com", phone: "", visibility: "everyone", created_at: nowIso(), updated_at: nowIso() },
     { id: "p2", member_id: "demo-3", member_name: "Priya Shah", grad_year: "2009", city: "Seattle", employer: "Cascade Labs", job_title: "Founder", bio: "", email: "", phone: "", visibility: "everyone", created_at: nowIso(), updated_at: nowIso() },
   ];
+  sortRoster(profiles);
 }
 
 async function loadProfiles() {
   if (!DB) { seedDemo(); return; }
-  const r = await dbq("SELECT * FROM app_alumni__profiles ORDER BY (grad_year = ''), grad_year DESC, member_name ASC");
-  profiles = r.rows;
+  // Ordered by grad_year alone so the plan is served by
+  // app_alumni__profiles_grad_id_idx with no sort step. member_name is
+  // encrypted at rest, so alphabetising it has to happen here, after decrypt.
+  // Keep this statement matching manifest.preload.profiles or the preload
+  // silently stops answering it (see __tests__/preload.test.mjs).
+  const r = await dbq("SELECT * FROM app_alumni__profiles ORDER BY grad_year DESC, id ASC");
+  profiles = sortRoster(r.rows);
 }
 
 async function refresh() {
@@ -179,6 +185,7 @@ async function saveProfile(fields, existingId) {
         );
       }
       profiles[idx] = { ...profiles[idx], grad_year: gradYear, city: fields.city.trim(), employer: fields.employer.trim(), job_title: fields.job_title.trim(), bio: fields.bio.trim(), email: fields.email.trim(), phone: fields.phone.trim(), updated_at: now };
+      sortRoster(profiles);
       closeModal();
       showNotice("Profile saved.");
     } catch (e) { showError(e.message); }
@@ -200,7 +207,7 @@ async function saveProfile(fields, existingId) {
         [row.id, row.member_id, row.member_name, row.grad_year, row.city, row.employer, row.job_title, row.bio, row.email, row.phone, row.created_at, row.updated_at]
       );
     }
-    profiles = [row, ...profiles];
+    profiles = sortRoster([row, ...profiles]);
     closeModal();
     showNotice("Your alumni profile is live.");
   } catch (e) { showError(e.message); }
