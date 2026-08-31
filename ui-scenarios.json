@@ -1,0 +1,46 @@
+{
+  "scenarios": [
+    {
+      "name": "edit controls render only on the viewer's own profile",
+      "members": { "alum": "child", "other": "child" },
+      "steps": [
+        { "action": "seedRaw",
+          "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, visibility, created_at, updated_at) VALUES ('al-mine', ?, ?, '2014', ?, 'everyone', '2026-08-01T09:00:00Z', '2026-08-01T09:00:00Z')",
+          "params": ["{{alum}}", "Dana Alum", "Springfield"] },
+        { "action": "seedRaw",
+          "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, visibility, created_at, updated_at) VALUES ('al-theirs', ?, ?, '2016', ?, 'everyone', '2026-08-01T10:00:00Z', '2026-08-01T10:00:00Z')",
+          "params": ["{{other}}", "Robin Other", "Shelbyville"] },
+
+        { "action": "open", "as": "alum" },
+        { "action": "expectVisible", "as": "alum", "selector": "[data-testid=\"profile-card\"][data-profile-id=\"al-theirs\"]" },
+        { "action": "expectVisible", "as": "alum", "selector": "[data-testid=\"profile-card\"][data-profile-id=\"al-mine\"]" },
+        { "action": "expectText", "as": "alum", "text": "Robin Other" },
+        { "action": "expectCount", "as": "alum", "selector": "[data-testid=\"profile-actions\"][data-profile-id=\"al-mine\"]", "count": 1 },
+        { "action": "expectCount", "as": "alum", "selector": "[data-testid=\"profile-actions\"][data-profile-id=\"al-theirs\"]", "count": 0 },
+
+        { "action": "open", "as": "other" },
+        { "action": "expectVisible", "as": "other", "selector": "[data-testid=\"profile-actions\"][data-profile-id=\"al-theirs\"]" },
+        { "action": "expectCount", "as": "other", "selector": "[data-testid=\"profile-actions\"][data-profile-id=\"al-theirs\"]", "count": 1 },
+        { "action": "expectCount", "as": "other", "selector": "[data-testid=\"profile-actions\"][data-profile-id=\"al-mine\"]", "count": 0 }
+      ]
+    },
+    {
+      "name": "a child does not see another alum's contact details",
+      "members": { "alum": "adult", "kid": "child" },
+      "steps": [
+        { "action": "seedRaw",
+          "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, email, phone, visibility, created_at, updated_at) VALUES ('al-contact', ?, ?, '2010', ?, ?, 'everyone', '2026-08-02T09:00:00Z', '2026-08-02T09:00:00Z')",
+          "params": ["{{alum}}", "Dana Alum", "dana.alum@example.com", "555-0142"] },
+
+        { "action": "open", "as": "kid" },
+        { "action": "expectVisible", "as": "kid", "selector": "[data-testid=\"profile-card\"][data-profile-id=\"al-contact\"]" },
+        { "action": "expectCount", "as": "kid", "selector": "[data-testid=\"profile-contact\"][data-profile-id=\"al-contact\"]", "count": 0 },
+        { "action": "expectNoText", "as": "kid", "text": "dana.alum@example.com" },
+
+        { "action": "open", "as": "alum" },
+        { "action": "expectVisible", "as": "alum", "selector": "[data-testid=\"profile-contact\"][data-profile-id=\"al-contact\"]" },
+        { "action": "expectText", "as": "alum", "text": "dana.alum@example.com" }
+      ]
+    }
+  ]
+}

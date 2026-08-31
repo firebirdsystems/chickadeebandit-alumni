@@ -316,14 +316,14 @@ function contactBlock(p) {
   const rows = [];
   if (p.email) rows.push(`<a href="mailto:${esc(p.email)}">${esc(p.email)}</a>`);
   if (p.phone) rows.push(`<a href="tel:${esc(p.phone)}">${esc(p.phone)}</a>`);
-  return rows.length ? `<div class="contact">${rows.join("")}</div>` : "";
+  return rows.length ? `<div class="contact" data-testid="profile-contact" data-profile-id="${esc(p.id)}">${rows.join("")}</div>` : "";
 }
 
 function renderProfile(p) {
   const mine = p.member_id === currentMember?.id;
   const metaBits = [p.grad_year ? `Class of ${p.grad_year}` : "", p.city, [p.job_title, p.employer].filter(Boolean).join(" @ ")].filter(Boolean);
   return `
-    <article class="card">
+    <article class="card" data-testid="profile-card" data-profile-id="${esc(p.id)}">
       <div class="alum-head">
         <div>
           <div class="alum-name">${esc(p.member_name)} ${mine ? `<span class="pill me">You</span>` : ""}</div>
@@ -333,7 +333,7 @@ function renderProfile(p) {
       ${p.bio ? `<div class="alum-bio">${esc(p.bio)}</div>` : ""}
       ${contactBlock(p)}
       ${canManage(p) ? `
-        <div class="row-actions">
+        <div class="row-actions" data-testid="profile-actions" data-profile-id="${esc(p.id)}">
           <button class="btn btn-ghost btn-sm" data-edit="${esc(p.id)}">Edit</button>
           <button class="btn btn-danger btn-sm" data-remove="${esc(p.id)}">Remove</button>
         </div>` : ""}
