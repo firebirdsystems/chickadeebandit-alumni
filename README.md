@@ -1,5 +1,7 @@
 # Alumni Network
 
+A [Chickadee Bandit](https://chickadeebandit.com/app-library/alumni) app.
+
 A searchable alumni roster — graduation year, current city, employer, and
 opt-in contact info. Alumni update their own profile, active members browse the
 network, and leadership manages the roster. Keeps chapter history alive without
