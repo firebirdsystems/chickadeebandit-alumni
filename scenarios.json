@@ -31,6 +31,172 @@
           "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "email": "kid@example.com" }] }
         }
       ]
+    },
+    {
+      "name": "in a shared space another member's profile email and phone are masked for a participant adult but visible to the steward",
+      "context": "shared_space",
+      "members": { "a": "adult", "b": "adult", "steward": "admin" },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, email, phone, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, 'everyone', ?, ?)",
+          "params": [
+            "pr-b",
+            "{{b}}",
+            "B Alum",
+            "b@example.com",
+            "555-0102",
+            "2026-01-01T00:00:00Z",
+            "2026-01-01T00:00:00Z"
+          ]
+        },
+        {
+          "action": "db",
+          "as": "b",
+          "sql": "SELECT email, phone FROM app_alumni__profiles WHERE id = ?",
+          "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "email": "b@example.com", "phone": "555-0102" }] },
+          "params": ["pr-b"]
+        },
+        {
+          "action": "db",
+          "as": "a",
+          "sql": "SELECT member_name, email, phone FROM app_alumni__profiles WHERE id = ?",
+          "expect": {
+            "status": 200,
+            "rowCount": 1,
+            "rowsContain": [{ "member_name": "B Alum", "email": null, "phone": null }]
+          },
+          "params": ["pr-b"]
+        },
+        {
+          "action": "db",
+          "as": "steward",
+          "sql": "SELECT email, phone FROM app_alumni__profiles WHERE id = ?",
+          "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "email": "b@example.com", "phone": "555-0102" }] },
+          "params": ["pr-b"]
+        }
+      ]
+    },
+    {
+      "name": "a leadership-group member edits another alum's profile; a plain adult outside the group changes nothing",
+      "members": { "leader": "adult", "outsider": "adult", "alum": "adult" },
+      "steps": [
+        { "action": "seedGroup", "group": "leadership", "name": "Leadership", "members": ["leader"] },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_alumni__alumni_settings (key, value) VALUES ('leadership_group_id', ?)",
+          "params": ["{{group:leadership}}"]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, city, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, 'everyone', ?, ?)",
+          "params": ["pr-alum", "{{alum}}", "Alum", "Springfield", "2026-01-01T00:00:00Z", "2026-01-01T00:00:00Z"]
+        },
+        {
+          "action": "db",
+          "as": "outsider",
+          "sql": "UPDATE app_alumni__profiles SET city = 'Shelbyville' WHERE id = ?",
+          "params": ["pr-alum"],
+          "expect": { "status": 200 }
+        },
+        {
+          "action": "db",
+          "as": "alum",
+          "sql": "SELECT city FROM app_alumni__profiles WHERE id = ?",
+          "params": ["pr-alum"],
+          "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "city": "Springfield" }] }
+        },
+        {
+          "action": "db",
+          "as": "leader",
+          "sql": "UPDATE app_alumni__profiles SET city = 'Capital City' WHERE id = ?",
+          "params": ["pr-alum"],
+          "expect": { "status": 200 }
+        },
+        {
+          "action": "db",
+          "as": "alum",
+          "sql": "SELECT city FROM app_alumni__profiles WHERE id = ?",
+          "params": ["pr-alum"],
+          "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "city": "Capital City" }] }
+        },
+        {
+          "action": "db",
+          "as": "outsider",
+          "sql": "DELETE FROM app_alumni__profiles WHERE id = ?",
+          "params": ["pr-alum"],
+          "expect": { "status": 200 }
+        },
+        {
+          "action": "db",
+          "as": "alum",
+          "sql": "SELECT id FROM app_alumni__profiles WHERE id = ?",
+          "params": ["pr-alum"],
+          "expect": { "status": 200, "rowCount": 1 }
+        },
+        {
+          "action": "db",
+          "as": "leader",
+          "sql": "DELETE FROM app_alumni__profiles WHERE id = ?",
+          "params": ["pr-alum"],
+          "expect": { "status": 200 }
+        },
+        {
+          "action": "db",
+          "as": "alum",
+          "sql": "SELECT id FROM app_alumni__profiles WHERE id = ?",
+          "params": ["pr-alum"],
+          "expect": { "status": 200, "rowCount": 0 }
+        }
+      ]
+    },
+    {
+      "name": "in a shared space a leadership-group participant sees another alum's email and phone while a plain participant sees them masked",
+      "context": "shared_space",
+      "members": { "leader": "adult", "outsider": "adult", "alum": "adult", "steward": "admin" },
+      "steps": [
+        { "action": "seedGroup", "group": "leadership", "name": "Leadership", "members": ["leader"] },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_alumni__alumni_settings (key, value) VALUES ('leadership_group_id', ?)",
+          "params": ["{{group:leadership}}"]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, email, phone, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, 'everyone', ?, ?)",
+          "params": [
+            "pr-alum",
+            "{{alum}}",
+            "Alum",
+            "alum@example.com",
+            "555-0199",
+            "2026-01-01T00:00:00Z",
+            "2026-01-01T00:00:00Z"
+          ]
+        },
+        {
+          "action": "db",
+          "as": "leader",
+          "sql": "SELECT email, phone FROM app_alumni__profiles WHERE id = ?",
+          "params": ["pr-alum"],
+          "expect": {
+            "status": 200,
+            "rowCount": 1,
+            "rowsContain": [{ "email": "alum@example.com", "phone": "555-0199" }]
+          }
+        },
+        {
+          "action": "db",
+          "as": "outsider",
+          "sql": "SELECT member_name, email, phone FROM app_alumni__profiles WHERE id = ?",
+          "params": ["pr-alum"],
+          "expect": {
+            "status": 200,
+            "rowCount": 1,
+            "rowsContain": [{ "member_name": "Alum", "email": null, "phone": null }]
+          }
+        }
+      ]
     }
   ]
 }
