@@ -76,7 +76,7 @@
 </div>
 
 <script type="module">
-import { esc, isAdult, hubConfirm, searchMatch } from "/hub-sdk.js";
+import { esc, isAdult, hubConfirm, searchMatch, glyph } from "/hub-sdk.js";
 import { isLeadership as _isLeadership, searchableFields, sortRoster } from "./logic.js";
 
 const CONTEXT = window.__CONTEXT_URL ?? "";
@@ -307,7 +307,7 @@ function renderSettingsBar() {
   if (!IS_ADMIN) return "";
   return `
     <div class="settings-bar">
-      <span>🔧 Leadership group (manages the roster):</span>
+      <span>${glyph("wrench")} Leadership group (manages the roster):</span>
       <select id="lead-group">
         <option value="">— none —</option>
         ${groups.map(g => `<option value="${esc(g.id)}" ${g.id === leadershipGroupId ? "selected" : ""}>${esc(g.name || g.id)}</option>`).join("")}
@@ -356,7 +356,7 @@ function render() {
   root.innerHTML = `
     <div class="topbar">
       <div>
-        <h1>🎓 Alumni Network</h1>
+        <h1>${glyph("graduation")} Alumni Network</h1>
         <p class="muted tiny">${profiles.length} alum${profiles.length === 1 ? "" : "ni"}${isLeadership() ? " · you manage the roster" : ""}</p>
       </div>
       <button class="btn" data-profile="${mine ? esc(mine.id) : ""}">${mine ? "Edit my profile" : "Add my profile"}</button>
