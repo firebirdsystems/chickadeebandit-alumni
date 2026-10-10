@@ -1,0 +1,913 @@
+{
+  "groups": [
+    {
+      "key": "leadership",
+      "name": "Leadership",
+      "members": [
+        "{{me}}",
+        "{{partner}}"
+      ]
+    }
+  ],
+  "seed": [
+    {
+      "sql": "INSERT INTO app_alumni__alumni_settings (key, value) VALUES (?, ?)",
+      "params": [
+        "leadership_group_id",
+        "{{group:leadership}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, bio, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-150 days','+0 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-150 days','+0 minutes'))",
+      "params": [
+        "perf-alum-01",
+        "{{me}}",
+        "Perf Admin",
+        "2024",
+        "Chicago, IL",
+        "Northwind Health",
+        "Product Manager",
+        "Chapter treasurer senior year. Happy to talk careers with anyone graduating.",
+        "perf.admin@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, email, phone, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-148 days','+11 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-142 days','+11 minutes'))",
+      "params": [
+        "perf-alum-02",
+        "{{partner}}",
+        "Perf Partner",
+        "2019",
+        "Austin, TX",
+        "Brightline Labs",
+        "Software Engineer",
+        "perf.partner@example.com",
+        "555-0101",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-146 days','+22 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-134 days','+22 minutes'))",
+      "params": [
+        "perf-alum-03",
+        "{{adult2}}",
+        "Perf Adult",
+        "2014",
+        "Seattle, WA",
+        "Self-employed",
+        "Research Scientist",
+        "perf.adult@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, bio, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-144 days','+33 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-126 days','+33 minutes'))",
+      "params": [
+        "perf-alum-04",
+        "{{child}}",
+        "Perf Child",
+        "2009",
+        "Boston, MA",
+        "Ironwood Legal",
+        "Attorney",
+        "Former social chair. Ask me about the 2015 formal.",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, employer, job_title, email, phone, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-142 days','+44 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-118 days','+44 minutes'))",
+      "params": [
+        "perf-alum-05",
+        "{{child2}}",
+        "Perf Child Two",
+        "2004",
+        "City of Springfield",
+        "Graphic Designer",
+        "perf.child.two@example.com",
+        "555-0104",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-140 days','+55 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-140 days','+55 minutes'))",
+      "params": [
+        "perf-alum-06",
+        "perf-alum-member-06",
+        "Tobias Brooks",
+        "1999",
+        "Atlanta, GA",
+        "tobias.brooks@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, bio, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-138 days','+66 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-132 days','+66 minutes'))",
+      "params": [
+        "perf-alum-07",
+        "perf-alum-member-07",
+        "Keiko Ramirez",
+        "2021",
+        "Portland, OR",
+        "Open Table Collective",
+        "Operations Lead",
+        "Still organizing the homecoming tailgate every fall.",
+        "keiko.ramirez@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, phone, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-136 days','+77 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-124 days','+77 minutes'))",
+      "params": [
+        "perf-alum-08",
+        "perf-alum-member-08",
+        "Andre Yamamoto",
+        "2016",
+        "Minneapolis, MN",
+        "Lakeshore Capital",
+        "Civil Engineer",
+        "555-0107",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-134 days','+88 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-116 days','+88 minutes'))",
+      "params": [
+        "perf-alum-09",
+        "perf-alum-member-09",
+        "Sofia Chen",
+        "2011",
+        "Raleigh, NC",
+        "Harbor Freight Logistics",
+        "Founder",
+        "sofia.chen@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, city, employer, job_title, bio, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-132 days','+99 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-108 days','+99 minutes'))",
+      "params": [
+        "perf-alum-10",
+        "perf-alum-member-10",
+        "Liam Petrov",
+        "San Diego, CA",
+        "Summit Engineering",
+        "Nurse Practitioner",
+        "Mentoring current members on interviews and resumes.",
+        "liam.petrov@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, email, phone, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-130 days','+110 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-130 days','+110 minutes'))",
+      "params": [
+        "perf-alum-11",
+        "perf-alum-member-11",
+        "Nadia Abernathy",
+        "2001",
+        "London, UK",
+        "Northwind Health",
+        "Financial Analyst",
+        "nadia.abernathy@example.com",
+        "555-0110",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-128 days','+121 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-122 days','+121 minutes'))",
+      "params": [
+        "perf-alum-12",
+        "perf-alum-member-12",
+        "Owen Sullivan",
+        "2023",
+        "Toronto, ON",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, bio, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-126 days','+132 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-114 days','+132 minutes'))",
+      "params": [
+        "perf-alum-13",
+        "perf-alum-member-13",
+        "Grace Novak",
+        "2018",
+        "Chicago, IL",
+        "Self-employed",
+        "Software Engineer",
+        "Moved three times since graduation; always looking for alumni nearby.",
+        "grace.novak@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, employer, job_title, email, phone, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-124 days','+143 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-106 days','+143 minutes'))",
+      "params": [
+        "perf-alum-14",
+        "perf-alum-member-14",
+        "Hector Whitfield",
+        "2013",
+        "Ironwood Legal",
+        "Research Scientist",
+        "hector.whitfield@example.com",
+        "555-0113",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-122 days','+154 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-98 days','+154 minutes'))",
+      "params": [
+        "perf-alum-15",
+        "perf-alum-member-15",
+        "Ingrid Castellano",
+        "2008",
+        "Seattle, WA",
+        "City of Springfield",
+        "Attorney",
+        "ingrid.castellano@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, bio, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-120 days','+165 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-120 days','+165 minutes'))",
+      "params": [
+        "perf-alum-16",
+        "perf-alum-member-16",
+        "Jamal Okafor",
+        "2003",
+        "Boston, MA",
+        "Cedar Ridge Schools",
+        "Graphic Designer",
+        "Chapter treasurer senior year. Happy to talk careers with anyone graduating.",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, email, phone, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-118 days','+176 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-112 days','+176 minutes'))",
+      "params": [
+        "perf-alum-17",
+        "perf-alum-member-17",
+        "Katya Haddad",
+        "1998",
+        "Denver, CO",
+        "Open Table Collective",
+        "Teacher",
+        "katya.haddad@example.com",
+        "555-0116",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-116 days','+187 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-104 days','+187 minutes'))",
+      "params": [
+        "perf-alum-18",
+        "perf-alum-member-18",
+        "Leo Lindqvist",
+        "2020",
+        "Atlanta, GA",
+        "leo.lindqvist@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, bio, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-114 days','+198 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-96 days','+198 minutes'))",
+      "params": [
+        "perf-alum-19",
+        "perf-alum-member-19",
+        "Mina Brooks",
+        "2015",
+        "Portland, OR",
+        "Harbor Freight Logistics",
+        "Civil Engineer",
+        "Former social chair. Ask me about the 2015 formal.",
+        "mina.brooks@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, phone, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-112 days','+209 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-88 days','+209 minutes'))",
+      "params": [
+        "perf-alum-20",
+        "perf-alum-member-20",
+        "Noah Ramirez",
+        "2010",
+        "Minneapolis, MN",
+        "Summit Engineering",
+        "Founder",
+        "555-0119",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-110 days','+220 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-110 days','+220 minutes'))",
+      "params": [
+        "perf-alum-21",
+        "perf-alum-member-21",
+        "Dana Yamamoto",
+        "2005",
+        "Raleigh, NC",
+        "Northwind Health",
+        "Nurse Practitioner",
+        "dana.yamamoto@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, bio, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-108 days','+231 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-102 days','+231 minutes'))",
+      "params": [
+        "perf-alum-22",
+        "perf-alum-member-22",
+        "Robin Chen",
+        "2000",
+        "San Diego, CA",
+        "Brightline Labs",
+        "Financial Analyst",
+        "Still organizing the homecoming tailgate every fall.",
+        "robin.chen@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, employer, job_title, email, phone, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-106 days','+242 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-94 days','+242 minutes'))",
+      "params": [
+        "perf-alum-23",
+        "perf-alum-member-23",
+        "Priya Petrov",
+        "2022",
+        "Self-employed",
+        "Product Manager",
+        "priya.petrov@example.com",
+        "555-0122",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-104 days','+253 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-86 days','+253 minutes'))",
+      "params": [
+        "perf-alum-24",
+        "perf-alum-member-24",
+        "Marcus Abernathy",
+        "2017",
+        "Toronto, ON",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, bio, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-102 days','+264 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-78 days','+264 minutes'))",
+      "params": [
+        "perf-alum-25",
+        "perf-alum-member-25",
+        "Elena Sullivan",
+        "2012",
+        "Chicago, IL",
+        "City of Springfield",
+        "Research Scientist",
+        "Mentoring current members on interviews and resumes.",
+        "elena.sullivan@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, email, phone, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-100 days','+275 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-100 days','+275 minutes'))",
+      "params": [
+        "perf-alum-26",
+        "perf-alum-member-26",
+        "Tobias Novak",
+        "2007",
+        "Austin, TX",
+        "Cedar Ridge Schools",
+        "Attorney",
+        "tobias.novak@example.com",
+        "555-0125",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, city, employer, job_title, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-98 days','+286 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-92 days','+286 minutes'))",
+      "params": [
+        "perf-alum-27",
+        "perf-alum-member-27",
+        "Keiko Whitfield",
+        "Seattle, WA",
+        "Open Table Collective",
+        "Graphic Designer",
+        "keiko.whitfield@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, bio, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-96 days','+297 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-84 days','+297 minutes'))",
+      "params": [
+        "perf-alum-28",
+        "perf-alum-member-28",
+        "Andre Castellano",
+        "2024",
+        "Boston, MA",
+        "Lakeshore Capital",
+        "Teacher",
+        "Moved three times since graduation; always looking for alumni nearby.",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, email, phone, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94 days','+308 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-76 days','+308 minutes'))",
+      "params": [
+        "perf-alum-29",
+        "perf-alum-member-29",
+        "Sofia Okafor",
+        "2019",
+        "Denver, CO",
+        "Harbor Freight Logistics",
+        "Operations Lead",
+        "sofia.okafor@example.com",
+        "555-0128",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-92 days','+319 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-68 days','+319 minutes'))",
+      "params": [
+        "perf-alum-30",
+        "perf-alum-member-30",
+        "Liam Haddad",
+        "2014",
+        "Atlanta, GA",
+        "liam.haddad@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, bio, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-90 days','+330 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-90 days','+330 minutes'))",
+      "params": [
+        "perf-alum-31",
+        "perf-alum-member-31",
+        "Nadia Lindqvist",
+        "2009",
+        "Portland, OR",
+        "Northwind Health",
+        "Founder",
+        "Chapter treasurer senior year. Happy to talk careers with anyone graduating.",
+        "nadia.lindqvist@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, employer, job_title, phone, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-88 days','+341 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-82 days','+341 minutes'))",
+      "params": [
+        "perf-alum-32",
+        "perf-alum-member-32",
+        "Owen Brooks",
+        "2004",
+        "Brightline Labs",
+        "Nurse Practitioner",
+        "555-0131",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-86 days','+352 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-74 days','+352 minutes'))",
+      "params": [
+        "perf-alum-33",
+        "perf-alum-member-33",
+        "Grace Ramirez",
+        "1999",
+        "Raleigh, NC",
+        "Self-employed",
+        "Financial Analyst",
+        "grace.ramirez@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, bio, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-84 days','+363 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-66 days','+363 minutes'))",
+      "params": [
+        "perf-alum-34",
+        "perf-alum-member-34",
+        "Hector Yamamoto",
+        "2021",
+        "San Diego, CA",
+        "Ironwood Legal",
+        "Product Manager",
+        "Former social chair. Ask me about the 2015 formal.",
+        "hector.yamamoto@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, email, phone, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-82 days','+374 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-58 days','+374 minutes'))",
+      "params": [
+        "perf-alum-35",
+        "perf-alum-member-35",
+        "Ingrid Chen",
+        "2016",
+        "London, UK",
+        "City of Springfield",
+        "Software Engineer",
+        "ingrid.chen@example.com",
+        "555-0134",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-80 days','+385 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-80 days','+385 minutes'))",
+      "params": [
+        "perf-alum-36",
+        "perf-alum-member-36",
+        "Jamal Petrov",
+        "2011",
+        "Toronto, ON",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, bio, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-78 days','+396 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-72 days','+396 minutes'))",
+      "params": [
+        "perf-alum-37",
+        "perf-alum-member-37",
+        "Katya Abernathy",
+        "2006",
+        "Chicago, IL",
+        "Open Table Collective",
+        "Attorney",
+        "Still organizing the homecoming tailgate every fall.",
+        "katya.abernathy@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, email, phone, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-76 days','+407 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-64 days','+407 minutes'))",
+      "params": [
+        "perf-alum-38",
+        "perf-alum-member-38",
+        "Leo Sullivan",
+        "2001",
+        "Austin, TX",
+        "Lakeshore Capital",
+        "Graphic Designer",
+        "leo.sullivan@example.com",
+        "555-0137",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-74 days','+418 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-56 days','+418 minutes'))",
+      "params": [
+        "perf-alum-39",
+        "perf-alum-member-39",
+        "Mina Novak",
+        "2023",
+        "Seattle, WA",
+        "Harbor Freight Logistics",
+        "Teacher",
+        "mina.novak@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, bio, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-72 days','+429 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-48 days','+429 minutes'))",
+      "params": [
+        "perf-alum-40",
+        "perf-alum-member-40",
+        "Noah Whitfield",
+        "2018",
+        "Boston, MA",
+        "Summit Engineering",
+        "Operations Lead",
+        "Mentoring current members on interviews and resumes.",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, employer, job_title, email, phone, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-70 days','+440 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-70 days','+440 minutes'))",
+      "params": [
+        "perf-alum-41",
+        "perf-alum-member-41",
+        "Dana Castellano",
+        "2013",
+        "Northwind Health",
+        "Civil Engineer",
+        "dana.castellano@example.com",
+        "555-0140",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-68 days','+451 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-62 days','+451 minutes'))",
+      "params": [
+        "perf-alum-42",
+        "perf-alum-member-42",
+        "Robin Okafor",
+        "2008",
+        "Atlanta, GA",
+        "robin.okafor@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, bio, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-66 days','+462 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-54 days','+462 minutes'))",
+      "params": [
+        "perf-alum-43",
+        "perf-alum-member-43",
+        "Priya Haddad",
+        "2003",
+        "Portland, OR",
+        "Self-employed",
+        "Nurse Practitioner",
+        "Moved three times since graduation; always looking for alumni nearby.",
+        "priya.haddad@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, city, employer, job_title, phone, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-64 days','+473 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-46 days','+473 minutes'))",
+      "params": [
+        "perf-alum-44",
+        "perf-alum-member-44",
+        "Marcus Lindqvist",
+        "Minneapolis, MN",
+        "Ironwood Legal",
+        "Financial Analyst",
+        "555-0143",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-62 days','+484 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-38 days','+484 minutes'))",
+      "params": [
+        "perf-alum-45",
+        "perf-alum-member-45",
+        "Elena Brooks",
+        "2020",
+        "Raleigh, NC",
+        "City of Springfield",
+        "Product Manager",
+        "elena.brooks@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, bio, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-60 days','+495 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-60 days','+495 minutes'))",
+      "params": [
+        "perf-alum-46",
+        "perf-alum-member-46",
+        "Tobias Ramirez",
+        "2015",
+        "San Diego, CA",
+        "Cedar Ridge Schools",
+        "Software Engineer",
+        "Chapter treasurer senior year. Happy to talk careers with anyone graduating.",
+        "tobias.ramirez@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, email, phone, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-58 days','+506 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-52 days','+506 minutes'))",
+      "params": [
+        "perf-alum-47",
+        "perf-alum-member-47",
+        "Keiko Yamamoto",
+        "2010",
+        "London, UK",
+        "Open Table Collective",
+        "Research Scientist",
+        "keiko.yamamoto@example.com",
+        "555-0146",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-56 days','+517 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-44 days','+517 minutes'))",
+      "params": [
+        "perf-alum-48",
+        "perf-alum-member-48",
+        "Andre Chen",
+        "2005",
+        "Toronto, ON",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, bio, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-54 days','+528 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-36 days','+528 minutes'))",
+      "params": [
+        "perf-alum-49",
+        "perf-alum-member-49",
+        "Sofia Petrov",
+        "2000",
+        "Chicago, IL",
+        "Harbor Freight Logistics",
+        "Graphic Designer",
+        "Former social chair. Ask me about the 2015 formal.",
+        "sofia.petrov@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, employer, job_title, email, phone, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-52 days','+539 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-28 days','+539 minutes'))",
+      "params": [
+        "perf-alum-50",
+        "perf-alum-member-50",
+        "Liam Abernathy",
+        "2022",
+        "Summit Engineering",
+        "Teacher",
+        "liam.abernathy@example.com",
+        "555-0149",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-50 days','+550 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-50 days','+550 minutes'))",
+      "params": [
+        "perf-alum-51",
+        "perf-alum-member-51",
+        "Nadia Sullivan",
+        "2017",
+        "Seattle, WA",
+        "Northwind Health",
+        "Operations Lead",
+        "nadia.sullivan@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, bio, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-48 days','+561 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-42 days','+561 minutes'))",
+      "params": [
+        "perf-alum-52",
+        "perf-alum-member-52",
+        "Owen Novak",
+        "2012",
+        "Boston, MA",
+        "Brightline Labs",
+        "Civil Engineer",
+        "Still organizing the homecoming tailgate every fall.",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, email, phone, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-46 days','+572 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-34 days','+572 minutes'))",
+      "params": [
+        "perf-alum-53",
+        "perf-alum-member-53",
+        "Grace Whitfield",
+        "2007",
+        "Denver, CO",
+        "Self-employed",
+        "Founder",
+        "grace.whitfield@example.com",
+        "555-0152",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44 days','+583 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-26 days','+583 minutes'))",
+      "params": [
+        "perf-alum-54",
+        "perf-alum-member-54",
+        "Hector Castellano",
+        "2002",
+        "Atlanta, GA",
+        "hector.castellano@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, bio, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-42 days','+594 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-18 days','+594 minutes'))",
+      "params": [
+        "perf-alum-55",
+        "perf-alum-member-55",
+        "Ingrid Okafor",
+        "2024",
+        "Portland, OR",
+        "City of Springfield",
+        "Financial Analyst",
+        "Mentoring current members on interviews and resumes.",
+        "ingrid.okafor@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, phone, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-40 days','+605 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-40 days','+605 minutes'))",
+      "params": [
+        "perf-alum-56",
+        "perf-alum-member-56",
+        "Jamal Haddad",
+        "2019",
+        "Minneapolis, MN",
+        "Cedar Ridge Schools",
+        "Product Manager",
+        "555-0155",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-38 days','+616 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-32 days','+616 minutes'))",
+      "params": [
+        "perf-alum-57",
+        "perf-alum-member-57",
+        "Katya Lindqvist",
+        "2014",
+        "Raleigh, NC",
+        "Open Table Collective",
+        "Software Engineer",
+        "katya.lindqvist@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, bio, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-36 days','+627 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-24 days','+627 minutes'))",
+      "params": [
+        "perf-alum-58",
+        "perf-alum-member-58",
+        "Leo Brooks",
+        "2009",
+        "San Diego, CA",
+        "Lakeshore Capital",
+        "Research Scientist",
+        "Moved three times since graduation; always looking for alumni nearby.",
+        "leo.brooks@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, employer, job_title, email, phone, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-34 days','+638 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','+638 minutes'))",
+      "params": [
+        "perf-alum-59",
+        "perf-alum-member-59",
+        "Mina Ramirez",
+        "2004",
+        "Harbor Freight Logistics",
+        "Attorney",
+        "mina.ramirez@example.com",
+        "555-0158",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-32 days','+649 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-8 days','+649 minutes'))",
+      "params": [
+        "perf-alum-60",
+        "perf-alum-member-60",
+        "Noah Yamamoto",
+        "1999",
+        "Toronto, ON",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, city, employer, job_title, bio, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-30 days','+660 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-30 days','+660 minutes'))",
+      "params": [
+        "perf-alum-61",
+        "perf-alum-member-61",
+        "Dana Chen",
+        "Chicago, IL",
+        "Northwind Health",
+        "Teacher",
+        "Chapter treasurer senior year. Happy to talk careers with anyone graduating.",
+        "dana.chen@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, email, phone, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-28 days','+671 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-22 days','+671 minutes'))",
+      "params": [
+        "perf-alum-62",
+        "perf-alum-member-62",
+        "Robin Petrov",
+        "2016",
+        "Austin, TX",
+        "Brightline Labs",
+        "Operations Lead",
+        "robin.petrov@example.com",
+        "555-0161",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, email, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-26 days','+682 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-14 days','+682 minutes'))",
+      "params": [
+        "perf-alum-63",
+        "perf-alum-member-63",
+        "Priya Abernathy",
+        "2011",
+        "Seattle, WA",
+        "Self-employed",
+        "Civil Engineer",
+        "priya.abernathy@example.com",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, bio, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-24 days','+693 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','+693 minutes'))",
+      "params": [
+        "perf-alum-64",
+        "perf-alum-member-64",
+        "Marcus Sullivan",
+        "2006",
+        "Boston, MA",
+        "Ironwood Legal",
+        "Founder",
+        "Former social chair. Ask me about the 2015 formal.",
+        "everyone"
+      ]
+    }
+  ]
+}
