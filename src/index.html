@@ -196,7 +196,7 @@ async function saveProfile(fields, existingId) {
       sortRoster(profiles);
       closeModal();
       showNotice("Profile saved.");
-    } catch (e) { showError(e.message); }
+    } catch (e) { console.error(e); showError("Couldn’t save the profile — try again."); }
     return;
   }
   // create my own profile
@@ -218,7 +218,7 @@ async function saveProfile(fields, existingId) {
     profiles = sortRoster([row, ...profiles]);
     closeModal();
     showNotice("Your alumni profile is live.");
-  } catch (e) { showError(e.message); }
+  } catch (e) { console.error(e); showError("Couldn’t publish the profile — try again."); }
 }
 
 async function removeProfile(id) {
@@ -237,7 +237,7 @@ async function removeProfile(id) {
     }
     profiles = profiles.filter(x => x.id !== id);
     showNotice("Removed.");
-  } catch (e) { showError(e.message); }
+  } catch (e) { console.error(e); showError("Couldn’t remove the profile — try again."); }
 }
 
 async function saveLeadershipGroup(value) {
@@ -250,7 +250,7 @@ async function saveLeadershipGroup(value) {
     }
     leadershipGroupId = value;
     showNotice(value ? "Leadership group updated." : "Leadership group cleared.");
-  } catch (e) { showError(e.message); }
+  } catch (e) { console.error(e); showError("Couldn’t save the leadership group — try again."); }
 }
 
 // ── modal ────────────────────────────────────────────────────────────────────
