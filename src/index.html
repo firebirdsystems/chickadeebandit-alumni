@@ -67,6 +67,8 @@
     .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 6px; }
     .grid.two { display: grid; gap: 10px; }
     @media (min-width: 520px) { .grid.two { grid-template-columns: 1fr 1fr; } }
+    .load-error { margin: 0 0 12px; padding: 10px 14px; border-radius: 10px; background: var(--hub-tint-danger, #fee2e2); color: var(--hub-tint-danger-fg, #b91c1c); font-size: 0.9rem; display: flex; gap: 10px; align-items: center; justify-content: space-between; }
+    .load-error-retry { background: none; border: 1px solid currentColor; border-radius: 8px; padding: 5px 10px; font: inherit; font-weight: 600; color: inherit; cursor: pointer; flex-shrink: 0; }
   </style>
   <base href="/run/alumni/">
 </head>
@@ -93,6 +95,7 @@ let leadershipGroupId = "";
 let query = "";
 let error = "";
 let notice = "";
+let loadFailed = false;
 let modalEl = null;
 
 function nowIso() { return new Date().toISOString(); }
@@ -101,8 +104,8 @@ function uid() { return crypto.randomUUID(); }
 async function dbq(sql, params = []) {
   if (!DB) return { rows: [] };
   const res = await fetch(DB, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sql, params }) });
-  const json = await res.json();
-  if (json.error) throw new Error(json.error);
+  const json = await res.json().catch(() => null);
+  if (!res.ok || !json || typeof json !== "object" || json.error) throw new Error(json?.error || "Couldn’t reach the hub. Try again.");
   return json;
 }
 
@@ -119,22 +122,19 @@ async function loadContext() {
     ];
     groups = [{ id: "g-lead", name: "Leadership", memberIds: ["demo-1"] }];
   } else {
-    try {
-      const res = await fetch(`${CONTEXT}?keys=family.members,family.groups`);
-      const ctx = await res.json();
-      members = ctx["family.members"] ?? [];
-      groups = ctx["family.groups"] ?? [];
-    } catch { members = []; groups = []; }
+    const res = await fetch(`${CONTEXT}?keys=family.members,family.groups`);
+    const ctx = await res.json().catch(() => null);
+    if (!res.ok || !ctx || typeof ctx !== "object" || ctx.$errors?.length) throw new Error("Couldn’t reach the hub. Try again.");
+    members = ctx["family.members"] ?? [];
+    groups = ctx["family.groups"] ?? [];
   }
   currentMember = HUB_MEMBER ?? members[0] ?? { id: "guest", name: "Guest", role: "adult" };
 }
 
 async function loadSettings() {
   if (!DB) { leadershipGroupId = "g-lead"; return; }
-  try {
-    const r = await dbq("SELECT value FROM app_alumni__alumni_settings WHERE key = ? LIMIT 1", ["leadership_group_id"]);
-    leadershipGroupId = r.rows?.[0]?.value ?? "";
-  } catch { leadershipGroupId = ""; }
+  const r = await dbq("SELECT value FROM app_alumni__alumni_settings WHERE key = ? LIMIT 1", ["leadership_group_id"]);
+  leadershipGroupId = r.rows?.[0]?.value ?? "";
 }
 
 function seedDemo() {
@@ -161,8 +161,9 @@ async function refresh() {
   try {
     await loadContext();
     await Promise.all([loadSettings(), loadProfiles()]);
+    loadFailed = false;
     render();
-  } catch (e) { error = e.message; render(); }
+  } catch { loadFailed = true; render(); }
 }
 
 function clearMessages() { error = ""; notice = ""; }
@@ -179,10 +180,17 @@ async function saveProfile(fields, existingId) {
     if (!canManage(profiles[idx])) return showError("You can only edit your own profile.");
     try {
       if (DB) {
-        await dbq(
+        const r = await dbq(
           `UPDATE app_alumni__profiles SET grad_year=?, city=?, employer=?, job_title=?, bio=?, email=?, phone=?, updated_at=? WHERE id=?`,
           [gradYear, fields.city.trim(), fields.employer.trim(), fields.job_title.trim(), fields.bio.trim(), fields.email.trim(), fields.phone.trim(), now, existingId]
         );
+        // The hub answers 200 with nothing changed when the caller may not
+        // write this row (or it is gone), so re-read rather than show a save.
+        if (r.changed === 0) {
+          await loadProfiles().catch(() => {});
+          closeModal();
+          return showError("Nothing was saved. You can no longer change this profile.");
+        }
       }
       profiles[idx] = { ...profiles[idx], grad_year: gradYear, city: fields.city.trim(), employer: fields.employer.trim(), job_title: fields.job_title.trim(), bio: fields.bio.trim(), email: fields.email.trim(), phone: fields.phone.trim(), updated_at: now };
       sortRoster(profiles);
@@ -220,7 +228,13 @@ async function removeProfile(id) {
   const ok = await hubConfirm({ message: `Remove ${p.member_name} from the alumni roster?`, confirmLabel: "Remove", destructive: true });
   if (!ok) return;
   try {
-    if (DB) await dbq(`DELETE FROM app_alumni__profiles WHERE id=?`, [id]);
+    if (DB) {
+      const r = await dbq(`DELETE FROM app_alumni__profiles WHERE id=?`, [id]);
+      if (r.changed === 0) {
+        await loadProfiles().catch(() => {});
+        return showError("Nothing was removed. You can no longer change this profile.");
+      }
+    }
     profiles = profiles.filter(x => x.id !== id);
     showNotice("Removed.");
   } catch (e) { showError(e.message); }
@@ -303,8 +317,14 @@ function openProfileModal(existingId) {
 // ── render ───────────────────────────────────────────────────────────────────
 function renderMessages() { return `${error ? `<div class="error">${esc(error)}</div>` : ""}${notice ? `<div class="notice">${esc(notice)}</div>` : ""}`; }
 
+function renderLoadError() {
+  return loadFailed
+    ? `<div class="load-error" data-testid="load-error" role="alert"><span>Couldn’t load the alumni roster.</span> <button type="button" class="load-error-retry" data-testid="load-retry">Try again</button></div>`
+    : "";
+}
+
 function renderSettingsBar() {
-  if (!IS_ADMIN) return "";
+  if (!IS_ADMIN || loadFailed) return "";
   return `
     <div class="settings-bar">
       <span>${glyph("wrench")} Leadership group (manages the roster):</span>
@@ -357,15 +377,16 @@ function render() {
     <div class="topbar">
       <div>
         <h1>${glyph("graduation")} Alumni Network</h1>
-        <p class="muted tiny">${profiles.length} alum${profiles.length === 1 ? "" : "ni"}${isLeadership() ? " · you manage the roster" : ""}</p>
+        <p class="muted tiny">${loadFailed ? "" : `${profiles.length} alum${profiles.length === 1 ? "" : "ni"}${isLeadership() ? " · you manage the roster" : ""}`}</p>
       </div>
-      <button class="btn" data-profile="${mine ? esc(mine.id) : ""}">${mine ? "Edit my profile" : "Add my profile"}</button>
+      ${loadFailed ? "" : `<button class="btn" data-profile="${mine ? esc(mine.id) : ""}">${mine ? "Edit my profile" : "Add my profile"}</button>`}
     </div>
+    ${renderLoadError()}
     ${renderMessages()}
     ${renderSettingsBar()}
     <div class="search"><input id="search" type="search" placeholder="Search by name, year, city, employer…" value="${esc(query)}" /></div>
     <section class="grid cards">
-      ${list.length ? list.map(renderProfile).join("") : `<div class="card empty">${profiles.length ? "No alumni match your search." : "No alumni yet — add your profile to get started."}</div>`}
+      ${list.length ? list.map(renderProfile).join("") : loadFailed ? "" : `<div class="card empty">${profiles.length ? "No alumni match your search." : "No alumni yet — add your profile to get started."}</div>`}
     </section>
   `;
   const s = document.getElementById("search");
@@ -382,13 +403,14 @@ function matchingProfiles() {
 function rerenderList() {
   const list = matchingProfiles();
   const container = document.querySelector(".grid.cards");
-  if (container) container.innerHTML = list.length ? list.map(renderProfile).join("") : `<div class="card empty">${profiles.length ? "No alumni match your search." : "No alumni yet."}</div>`;
+  if (container) container.innerHTML = list.length ? list.map(renderProfile).join("") : loadFailed ? "" : `<div class="card empty">${profiles.length ? "No alumni match your search." : "No alumni yet."}</div>`;
 }
 
 // ── events ───────────────────────────────────────────────────────────────────
 document.addEventListener("click", (e) => {
   const t = e.target.closest("button");
   if (!t) return;
+  if (t.dataset.testid === "load-retry") { refresh(); return; }
   if (t.hasAttribute("data-close")) { closeModal(); return; }
   if (t.hasAttribute("data-profile")) { openProfileModal(t.getAttribute("data-profile") || null); return; }
   if (t.hasAttribute("data-edit")) { openProfileModal(t.getAttribute("data-edit")); return; }
