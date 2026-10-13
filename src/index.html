@@ -176,7 +176,8 @@ async function saveProfile(fields, existingId) {
   const now = nowIso();
   if (existingId) {
     const idx = profiles.findIndex(p => p.id === existingId);
-    if (idx === -1) return;
+    // The profile left the list while the form was open: a retry cannot save.
+    if (idx === -1) { closeModal(); return showError("Nothing was saved. This profile is no longer on the roster."); }
     if (!canManage(profiles[idx])) return showError("You can only edit your own profile.");
     try {
       if (DB) {
