@@ -429,10 +429,23 @@ document.addEventListener("submit", (e) => {
   const btn = f.querySelector(".modal-actions .btn:not(.btn-ghost)");
   const val = (id) => document.getElementById(id)?.value ?? "";
   if (btn) { btn.disabled = true; btn.textContent = "Saving…"; }
+  f.querySelector(".error")?.remove();
+  error = "";
   saveProfile({
     grad_year: val("f-grad"), city: val("f-city"), employer: val("f-employer"),
     job_title: val("f-title"), bio: val("f-bio"), email: val("f-email"), phone: val("f-phone"),
-  }, existingId).catch(() => { if (btn) { btn.disabled = false; btn.textContent = existingId ? "Save" : "Publish profile"; } });
+  }, existingId).catch((err) => { console.error(err); showError(existingId ? "Couldn’t save the profile — try again." : "Couldn’t publish the profile — try again."); })
+    // saveProfile reports its own failures and resolves, so the form still
+    // being open is what says it did not save: restore the button for a retry
+    // and repeat the message inside the modal, which covers the page banner.
+    .finally(() => {
+      if (!f.isConnected) return;
+      if (btn) { btn.disabled = false; btn.textContent = existingId ? "Save" : "Publish profile"; }
+      if (!error) return;
+      let msg = f.querySelector(".error");
+      if (!msg) { msg = document.createElement("div"); msg.className = "error"; msg.setAttribute("role", "alert"); f.querySelector(".modal-actions").before(msg); }
+      msg.textContent = error;
+    });
 });
 
 refresh();
