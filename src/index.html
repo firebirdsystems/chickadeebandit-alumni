@@ -250,7 +250,8 @@ async function saveProfile(fields, existingId, formEl = null) {
         } catch (readErr) { console.error(readErr); }
         // A 403 with no re-read may be the cap refusing this form's own stored
         // profile, so it stays "try again" rather than the permission line.
-        if (!stored && !reread && e?.status === 403) { console.error(e); return showError(writeFailed(null, "publish the profile")); }
+        // Likewise a UNIQUE answer: the id is ours, so with no re-read nothing is known.
+        if (!stored && !reread) { console.error(e); return showError(writeFailed(null, "publish the profile")); }
         if (!stored) throw e;
         console.error(e);
         // A profile made elsewhere: nothing from this form was stored. Open
