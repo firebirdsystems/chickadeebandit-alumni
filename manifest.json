@@ -56,9 +56,6 @@
     },
     "display": { "template": "badge", "count": "n", "label": "alumni", "severity": "info" }
   },
-  "resource_limits": {
-    "max_db_bytes": 10485760
-  },
   "ai_access": {
     "allowed": true,
     "mode": "read",
