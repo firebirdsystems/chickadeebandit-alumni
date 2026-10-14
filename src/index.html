@@ -79,7 +79,7 @@
 
 <script type="module">
 import { esc, isAdult, hubConfirm, searchMatch, glyph } from "/hub-sdk.js";
-import { isLeadership as _isLeadership, searchableFields, sortRoster } from "./logic.js";
+import { isLeadership as _isLeadership, searchableFields, sortRoster, failureLine } from "./logic.js";
 
 const CONTEXT = window.__CONTEXT_URL ?? "";
 const DB = window.__DB_URL ?? "";
@@ -105,7 +105,7 @@ async function dbq(sql, params = []) {
   if (!DB) return { rows: [] };
   const res = await fetch(DB, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sql, params }) });
   const json = await res.json().catch(() => null);
-  if (!res.ok || !json || typeof json !== "object" || json.error) throw new Error(json?.error || "Couldn’t reach the hub. Try again.");
+  if (!res.ok || !json || typeof json !== "object" || json.error) throw Object.assign(new Error(json?.error || "Couldn’t reach the hub. Try again."), { status: res.status, code: json?.code });
   return json;
 }
 
@@ -169,6 +169,13 @@ async function refresh() {
 function clearMessages() { error = ""; notice = ""; }
 function showError(m) { error = m; notice = ""; render(); }
 function showNotice(m) { notice = m; error = ""; render(); }
+// A failed write in this app's words, never the hub's; the error goes to the
+// console. `gone` is the re-read's answer after a write that changed nothing
+// (true: no row, false: refused, undefined: the re-read failed).
+function writeFailed(e, action, thing = "profile", gone) {
+  if (e) console.error(e);
+  return failureLine(e, { action, thing, gone });
+}
 
 // ── mutations ────────────────────────────────────────────────────────────────
 async function saveProfile(fields, existingId) {
@@ -188,16 +195,19 @@ async function saveProfile(fields, existingId) {
         // The hub answers 200 with nothing changed when the caller may not
         // write this row (or it is gone), so re-read rather than show a save.
         if (r.changed === 0) {
-          await loadProfiles().catch(() => {});
-          closeModal();
-          return showError("Nothing was saved. You can no longer change this profile.");
+          // No row on the re-read: removed. A row: refused (no longer allowed,
+          // e.g. after leaving the leadership group). A failed re-read: unknown.
+          const gone = await loadProfiles().then(() => !profiles.some(p => p.id === existingId), () => undefined);
+          // "Try again" keeps the form as typed; removed/refused close it.
+          if (gone !== undefined) closeModal();
+          return showError(writeFailed(null, "save the profile", "profile", gone));
         }
       }
       profiles[idx] = { ...profiles[idx], grad_year: gradYear, city: fields.city.trim(), employer: fields.employer.trim(), job_title: fields.job_title.trim(), bio: fields.bio.trim(), email: fields.email.trim(), phone: fields.phone.trim(), updated_at: now };
       sortRoster(profiles);
       closeModal();
       showNotice("Profile saved.");
-    } catch (e) { console.error(e); showError("Couldn’t save the profile — try again."); }
+    } catch (e) { showError(writeFailed(e, "save the profile")); }
     return;
   }
   // create my own profile
@@ -219,7 +229,7 @@ async function saveProfile(fields, existingId) {
     profiles = sortRoster([row, ...profiles]);
     closeModal();
     showNotice("Your alumni profile is live.");
-  } catch (e) { console.error(e); showError("Couldn’t publish the profile — try again."); }
+  } catch (e) { showError(writeFailed(e, "publish the profile")); }
 }
 
 async function removeProfile(id) {
@@ -232,13 +242,14 @@ async function removeProfile(id) {
     if (DB) {
       const r = await dbq(`DELETE FROM app_alumni__profiles WHERE id=?`, [id]);
       if (r.changed === 0) {
-        await loadProfiles().catch(() => {});
-        return showError("Nothing was removed. You can no longer change this profile.");
+        // No row on the re-read: removed. A row: refused. A failed re-read: unknown.
+        const gone = await loadProfiles().then(() => !profiles.some(x => x.id === id), () => undefined);
+        return showError(writeFailed(null, "remove the profile", "profile", gone));
       }
     }
     profiles = profiles.filter(x => x.id !== id);
     showNotice("Removed.");
-  } catch (e) { console.error(e); showError("Couldn’t remove the profile — try again."); }
+  } catch (e) { showError(writeFailed(e, "remove the profile")); }
 }
 
 async function saveLeadershipGroup(value) {
@@ -247,11 +258,11 @@ async function saveLeadershipGroup(value) {
     if (ADMIN_CONFIG_URL) {
       const res = await fetch(ADMIN_CONFIG_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key: "leadership_group_id", value }) });
       const json = await res.json();
-      if (!res.ok || json.error) throw new Error(json.error || "Save failed");
+      if (!res.ok || json.error) throw Object.assign(new Error(json.error || "Save failed"), { status: res.status, code: json.code });
     }
     leadershipGroupId = value;
     showNotice(value ? "Leadership group updated." : "Leadership group cleared.");
-  } catch (e) { console.error(e); showError("Couldn’t save the leadership group — try again."); }
+  } catch (e) { showError(writeFailed(e, "save the leadership group", "leadership group")); }
 }
 
 // ── modal ────────────────────────────────────────────────────────────────────

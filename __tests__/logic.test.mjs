@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { testPrivilegedGateContract } from "./helpers/privileged-gate.mjs";
-import { isLeadership, searchableFields, sortRoster } from "../src/logic.js";
+import { isLeadership, searchableFields, sortRoster, failureLine } from "../src/logic.js";
 
 // The isLeadership gate fronts the profiles write_owner_only + privileged_groups
 // policy, so it must satisfy the shared privileged-gate contract (no adult
@@ -59,5 +59,38 @@ describe("sortRoster", () => {
       { grad_year: "2004", member_name: "Sam" },
       { member_name: "Ada" },
     ])).toEqual(["Sam", "Ada", "Zoe"]);
+  });
+});
+
+describe("failureLine", () => {
+  const err = (props) => Object.assign(new Error("hub text that never reaches the screen"), props);
+  const opts = { action: "save the profile", thing: "profile" };
+  test("a duplicate already exists, by code or by the hub's text", () => {
+    expect(failureLine(err({ status: 400, code: "UNIQUE_CONSTRAINT" }), opts)).toBe("That profile already exists.");
+    expect(failureLine(new Error("UNIQUE constraint failed: x.id"), opts)).toBe("That profile already exists.");
+  });
+  test("a 403 is not allowed", () => {
+    expect(failureLine(err({ status: 403 }), opts)).toBe("You don’t have permission to save the profile.");
+  });
+  test("a 507 is storage full", () => {
+    expect(failureLine(err({ status: 507 }), opts)).toBe("The household’s storage is full — free up space first.");
+  });
+  test("removed for a 404, or when the re-read found no row", () => {
+    expect(failureLine(err({ status: 404 }), opts)).toBe("This profile has been removed.");
+    expect(failureLine(null, { ...opts, gone: true })).toBe("This profile has been removed.");
+  });
+  test("changed by someone else for a 409", () => {
+    expect(failureLine(err({ status: 409 }), opts)).toBe("This profile was changed by someone else — check it first.");
+  });
+  test("a plain write that changed nothing while the row is still there was refused", () => {
+    expect(failureLine(null, { ...opts, gone: false })).toBe("You don’t have permission to save the profile.");
+  });
+  test("a write that changed nothing and a failed re-read: try again, neither removed nor changed", () => {
+    expect(failureLine(null, { ...opts, gone: undefined })).toBe("Couldn’t save the profile — try again.");
+  });
+  test("try again when no answer came, the hub failed, or any other 400", () => {
+    for (const e of [new TypeError("Failed to fetch"), err({ status: 500 }), err({ status: 503 }), err({ status: 400 })]) {
+      expect(failureLine(e, opts)).toBe("Couldn’t save the profile — try again.");
+    }
   });
 });
