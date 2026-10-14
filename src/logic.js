@@ -77,3 +77,22 @@ export function failureLine(e, { action, thing, gone } = {}) {
   if (e?.status === 409) return `This ${thing} was changed by someone else — check it first.`;
   return `Couldn’t ${action} — try again.`;
 }
+
+/**
+ * Whether a failed write may still have been stored: no answer, a 2xx whose
+ * body could not be read, the hub's 400 for a write that timed out, or a 5xx
+ * other than storage full. Then the page reads the row back by its pinned id
+ * before saying anything.
+ */
+export function outcomeUnknown(e) {
+  const status = Number(e?.status) || 0;
+  return status === 0 || (status >= 200 && status < 300) || status === 400 || (status >= 500 && status !== 507);
+}
+
+/**
+ * Whether a stored row differs from what the form holds now, over the form's
+ * own fields only, compared as text with a missing value as empty.
+ */
+export function storedDiffers(row, fields) {
+  return Object.keys(fields).some((k) => String(row?.[k] ?? "") !== String(fields[k] ?? ""));
+}

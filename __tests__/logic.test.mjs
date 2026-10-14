@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { testPrivilegedGateContract } from "./helpers/privileged-gate.mjs";
-import { isLeadership, searchableFields, sortRoster, failureLine } from "../src/logic.js";
+import { isLeadership, searchableFields, sortRoster, failureLine, outcomeUnknown, storedDiffers } from "../src/logic.js";
 
 // The isLeadership gate fronts the profiles write_owner_only + privileged_groups
 // policy, so it must satisfy the shared privileged-gate contract (no adult
@@ -92,5 +92,26 @@ describe("failureLine", () => {
     for (const e of [new TypeError("Failed to fetch"), err({ status: 500 }), err({ status: 503 }), err({ status: 400 })]) {
       expect(failureLine(e, opts)).toBe("Couldn’t save the profile — try again.");
     }
+  });
+});
+
+describe("outcomeUnknown", () => {
+  test("no answer, an unreadable 2xx, a 400 or a 5xx other than 507 may have been stored", () => {
+    for (const e of [new TypeError("Failed to fetch"), { status: 200 }, { status: 400 }, { status: 500 }, { status: 503 }]) {
+      expect(outcomeUnknown(e)).toBe(true);
+    }
+  });
+  test("a refusal the hub named is known", () => {
+    for (const status of [403, 404, 409, 507]) expect(outcomeUnknown({ status })).toBe(false);
+  });
+});
+
+describe("storedDiffers", () => {
+  const fields = { grad_year: "2014", city: "Chicago", email: "" };
+  test("same values, with null and empty alike and extra stored columns ignored", () => {
+    expect(storedDiffers({ grad_year: 2014, city: "Chicago", email: null, id: "p1" }, fields)).toBe(false);
+  });
+  test("an edited field differs", () => {
+    expect(storedDiffers({ grad_year: "2014", city: "Denver", email: "" }, fields)).toBe(true);
   });
 });

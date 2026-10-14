@@ -31,6 +31,7 @@
       "visibility_column": "visibility",
       "everyone_values": ["everyone"],
       "write_owner_only": true,
+      "max_per_member": { "member_column": "member_id", "scope_columns": ["member_id"], "limit": 1 },
       "privileged_groups": [
         { "settings_table": "alumni_settings", "settings_key": "leadership_group_id" }
       ],

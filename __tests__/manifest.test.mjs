@@ -38,6 +38,12 @@ describe("manifest.json", () => {
     expect(Array.isArray(manifest.data_access.reads)).toBe(true);
     expect(Array.isArray(manifest.data_access.writes)).toBe(true);
   });
+
+  // One profile per member: the hub answers a second INSERT with 403, and the
+  // page counts that 403 as "found" when a re-read shows the member's own row.
+  it("caps profiles at one per member", () => {
+    expect(manifest.row_policies.profiles.max_per_member).toEqual({ member_column: "member_id", scope_columns: ["member_id"], limit: 1 });
+  });
 });
 
 // ── ai_access SQL file validation ─────────────────────────────────────────────

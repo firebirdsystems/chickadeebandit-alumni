@@ -79,7 +79,7 @@
 
 <script type="module">
 import { esc, isAdult, hubConfirm, searchMatch, glyph } from "/hub-sdk.js";
-import { isLeadership as _isLeadership, searchableFields, sortRoster, failureLine } from "./logic.js";
+import { isLeadership as _isLeadership, searchableFields, sortRoster, failureLine, outcomeUnknown, storedDiffers } from "./logic.js";
 
 const CONTEXT = window.__CONTEXT_URL ?? "";
 const DB = window.__DB_URL ?? "";
@@ -178,7 +178,8 @@ function writeFailed(e, action, thing = "profile", gone) {
 }
 
 // ── mutations ────────────────────────────────────────────────────────────────
-async function saveProfile(fields, existingId) {
+async function saveProfile(fields, existingId, formEl = null) {
+  const dialog = modalEl; // close only this dialog, not one opened since
   const gradYear = fields.grad_year.trim();
   const now = nowIso();
   if (existingId) {
@@ -199,36 +200,83 @@ async function saveProfile(fields, existingId) {
           // e.g. after leaving the leadership group). A failed re-read: unknown.
           const gone = await loadProfiles().then(() => !profiles.some(p => p.id === existingId), () => undefined);
           // "Try again" keeps the form as typed; removed/refused close it.
-          if (gone !== undefined) closeModal();
+          if (gone !== undefined && modalEl === dialog) closeModal();
           return showError(writeFailed(null, "save the profile", "profile", gone));
         }
       }
       profiles[idx] = { ...profiles[idx], grad_year: gradYear, city: fields.city.trim(), employer: fields.employer.trim(), job_title: fields.job_title.trim(), bio: fields.bio.trim(), email: fields.email.trim(), phone: fields.phone.trim(), updated_at: now };
       sortRoster(profiles);
-      closeModal();
+      if (modalEl === dialog) closeModal();
       showNotice("Profile saved.");
     } catch (e) { showError(writeFailed(e, "save the profile")); }
     return;
   }
   // create my own profile
-  const row = {
-    id: uid(), member_id: currentMember.id, member_name: currentMember.name,
+  const typed = {
     grad_year: gradYear, city: fields.city.trim(), employer: fields.employer.trim(),
     job_title: fields.job_title.trim(), bio: fields.bio.trim(),
     email: fields.email.trim(), phone: fields.phone.trim(),
+  };
+  // The id is the form's, minted on its first Publish and sent on every retry:
+  // a try whose answer was lost may have stored the row, and a second press
+  // must find that row rather than add another.
+  const id = formEl ? (formEl.dataset.rowId ??= uid()) : uid();
+  let row = {
+    id, member_id: currentMember.id, member_name: currentMember.name, ...typed,
     visibility: "everyone", created_at: now, updated_at: now,
   };
+  let note = "";
   try {
     if (DB) {
-      await dbq(
-        `INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, bio, email, phone, visibility, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'everyone', ?, ?)`,
-        [row.id, row.member_id, row.member_name, row.grad_year, row.city, row.employer, row.job_title, row.bio, row.email, row.phone, row.created_at, row.updated_at]
-      );
+      try {
+        await dbq(
+          `INSERT INTO app_alumni__profiles (id, member_id, member_name, grad_year, city, employer, job_title, bio, email, phone, visibility, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'everyone', ?, ?)`,
+          [row.id, row.member_id, row.member_name, row.grad_year, row.city, row.employer, row.job_title, row.bio, row.email, row.phone, row.created_at, row.updated_at]
+        );
+      } catch (e) {
+        // Unknown outcome: read back by the pinned id. A 403 is the one-profile
+        // cap when the member already has one: the re-read finding their own
+        // profile counts as found. Found means an earlier try (or another tab)
+        // stored it; the success path runs now, once, with the row as stored.
+        // Not found, or the read failed: the save fails as before, id pinned.
+        if (!outcomeUnknown(e) && e?.status !== 403) throw e;
+        let stored = null;
+        let reread = false;
+        try {
+          await loadProfiles();
+          reread = true;
+          stored = profiles.find(p => p.id === id) ?? (e?.status === 403 ? myProfile() : null);
+        } catch (readErr) { console.error(readErr); }
+        // A 403 with no re-read may be the cap refusing this form's own stored
+        // profile, so it stays "try again" rather than the permission line.
+        if (!stored && !reread && e?.status === 403) { console.error(e); return showError(writeFailed(null, "publish the profile")); }
+        if (!stored) throw e;
+        console.error(e);
+        // A profile made elsewhere: nothing from this form was stored. Open
+        // that profile for editing with what was typed here.
+        if (stored.id !== id) {
+          const msg = "You already have a profile — update it instead.";
+          if (modalEl !== dialog) return showError(msg);
+          openProfileModal(stored.id);
+          const f = modalEl.querySelector("#profile-form");
+          const inputs = { "f-grad": "grad_year", "f-city": "city", "f-employer": "employer", "f-title": "job_title", "f-bio": "bio", "f-email": "email", "f-phone": "phone" };
+          for (const [inputId, k] of Object.entries(inputs)) { const el = f.querySelector(`#${inputId}`); if (el) el.value = typed[k]; }
+          showError(msg);
+          const box = document.createElement("div");
+          box.className = "error"; box.setAttribute("role", "alert"); box.textContent = msg;
+          f.querySelector(".modal-actions").before(box);
+          return;
+        }
+        // Edited since that first try: what was stored is kept, and said so.
+        if (storedDiffers(stored, typed)) note = "Saved as first entered — check it and update what changed.";
+        row = stored;
+      }
     }
-    profiles = sortRoster([row, ...profiles]);
-    closeModal();
-    showNotice("Your alumni profile is live.");
+    if (formEl) delete formEl.dataset.rowId;
+    profiles = sortRoster([row, ...profiles.filter(x => x.id !== row.id)]);
+    if (modalEl === dialog) closeModal();
+    if (note) showError(note); else showNotice("Your alumni profile is live.");
   } catch (e) { showError(writeFailed(e, "publish the profile")); }
 }
 
@@ -279,7 +327,9 @@ function openModal(html) {
 function closeModal() { modalEl?.remove(); modalEl = null; }
 
 function openProfileModal(existingId) {
-  const p = existingId ? profiles.find(x => x.id === existingId) : null;
+  // One profile per member (the hub caps it): with one on the roster already,
+  // "add" opens it for editing instead.
+  const p = existingId ? profiles.find(x => x.id === existingId) : myProfile();
   openModal(`
     <h2>${p ? "Edit profile" : "Create your alumni profile"}</h2>
     <form class="form" id="profile-form" data-id="${p ? esc(p.id) : ""}">
@@ -446,7 +496,7 @@ document.addEventListener("submit", (e) => {
   saveProfile({
     grad_year: val("f-grad"), city: val("f-city"), employer: val("f-employer"),
     job_title: val("f-title"), bio: val("f-bio"), email: val("f-email"), phone: val("f-phone"),
-  }, existingId).catch((err) => { console.error(err); showError(existingId ? "Couldn’t save the profile — try again." : "Couldn’t publish the profile — try again."); })
+  }, existingId, f).catch((err) => { console.error(err); showError(existingId ? "Couldn’t save the profile — try again." : "Couldn’t publish the profile — try again."); })
     // saveProfile reports its own failures and resolves, so the form still
     // being open is what says it did not save: restore the button for a retry
     // and repeat the message inside the modal, which covers the page banner.

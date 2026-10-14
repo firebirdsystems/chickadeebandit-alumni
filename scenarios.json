@@ -197,6 +197,33 @@
           }
         }
       ]
+    },
+    {
+      "name": "a member holds at most one profile: a second profile INSERT for the same member is refused with 403",
+      "members": { "alum": "adult" },
+      "steps": [
+        {
+          "action": "db",
+          "as": "alum",
+          "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, city, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, 'everyone', ?, ?)",
+          "params": ["pr-one", "{{alum}}", "Alum", "Springfield", "2026-01-01T00:00:00Z", "2026-01-01T00:00:00Z"],
+          "expect": { "status": 200 }
+        },
+        {
+          "action": "db",
+          "as": "alum",
+          "sql": "INSERT INTO app_alumni__profiles (id, member_id, member_name, city, visibility, created_at, updated_at) VALUES (?, ?, ?, ?, 'everyone', ?, ?)",
+          "params": ["pr-two", "{{alum}}", "Alum", "Shelbyville", "2026-01-01T00:00:00Z", "2026-01-01T00:00:00Z"],
+          "expect": { "status": 403 }
+        },
+        {
+          "action": "db",
+          "as": "alum",
+          "sql": "SELECT id FROM app_alumni__profiles WHERE id = ?",
+          "params": ["pr-two"],
+          "expect": { "status": 200, "rowCount": 0 }
+        }
+      ]
     }
   ]
 }
