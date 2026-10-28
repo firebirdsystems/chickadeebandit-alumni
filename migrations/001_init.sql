@@ -6,7 +6,7 @@
 --   trust root for "who is leadership" — an ordinary adult must not be able to
 --   crown themselves by rewriting the pointer.
 CREATE TABLE IF NOT EXISTS app_alumni__alumni_settings (
-  key   TEXT PRIMARY KEY,
+  key   TEXT NOT NULL PRIMARY KEY,
   value TEXT NOT NULL
 );
 
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS app_alumni__alumni_settings (
 --   an active adult member, or leadership can see contact info.
 --   grad_year is declared plaintext so it can be sorted in SQL.
 CREATE TABLE IF NOT EXISTS app_alumni__profiles (
-  id          TEXT PRIMARY KEY,
+  id          TEXT NOT NULL PRIMARY KEY,
   member_id   TEXT NOT NULL,
   member_name TEXT NOT NULL,
   grad_year   TEXT DEFAULT '',
